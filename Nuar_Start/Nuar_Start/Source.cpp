@@ -1,8 +1,6 @@
 #include <iostream>
 
-
 int main() {
-	std::cout << "Hello Alex\n";
-	std::cout << "Hello Lesha :))\n";
+	std::cout << "redone\n";
 	return 0;
 }
