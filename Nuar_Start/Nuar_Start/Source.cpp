@@ -48,6 +48,10 @@ void PullMe() {
 
 	cout << "Keks";
 }
+void PullMe() {
+
+	cout << "Keks";
+}
 
 int main() {
 	std::cout << "redone\n";
