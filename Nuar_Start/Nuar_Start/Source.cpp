@@ -76,6 +76,15 @@ class R_Bandit {												//роль бандита
 };
 
 
+void PullMe() {
+
+	cout << "Keks";
+}
+void PullMe() {
+
+	cout << "Keks";
+}
+
 int main() {
 <<<<<<< HEAD
 	NDetective A = new NPlayer;
