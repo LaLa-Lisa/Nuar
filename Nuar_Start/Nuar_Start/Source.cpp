@@ -44,6 +44,11 @@ class R_Bandit {												//роль бандита
 };
 
 
+void PullMe() {
+
+	cout << "Keks";
+}
+
 int main() {
 	std::cout << "redone\n";
 	std::cout << "Is it works?\n";
