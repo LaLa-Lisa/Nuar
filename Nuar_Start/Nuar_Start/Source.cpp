@@ -1,5 +1,49 @@
 #include <iostream>
 
+using namespace std;
+
+class PlayField {												//поле
+	public:
+		//...
+
+	private:
+		//...
+
+};
+class Person {												//персонаж (убит, подозревается, оправдан)
+	public:
+		//...
+	
+	private:
+		//...
+
+};
+class Player {												//игрок
+	public:
+		//...
+
+	private:
+		//...
+
+};
+class R_Inspector {												//роль инспектора(сыщика)
+	public:
+		//...
+
+	private:
+		//...
+
+};
+class R_Bandit {												//роль бандита
+	public:
+		//...
+
+	private:
+		//...
+
+};
+
+
 int main() {
 	std::cout << "redone\n";
 	std::cout << "Is it works?\n";
