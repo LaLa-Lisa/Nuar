@@ -108,9 +108,10 @@ public:
 	void PrintMe() {
 		for (int i = 0; i < field.size(); ++i) {
 			for (int j = 0; j < field[i].size(); ++j) {
+				std::cout.width(20);
 				std::cout << field[i][j].name << " ";
 			}
-			std::cout << "\n";
+			std::cout << "\n\n";
 		}
 	};
 	void Hide();
