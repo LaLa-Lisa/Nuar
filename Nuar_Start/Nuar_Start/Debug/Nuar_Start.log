@@ -1,9 +1,9 @@
 ﻿  Source.cpp
-d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(73): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(77): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(96): warning C4018: <: несоответствие типов со знаком и без знака
-d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(97): warning C4018: <: несоответствие типов со знаком и без знака
-d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(111): warning C4018: <: несоответствие типов со знаком и без знака
-d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(112): warning C4018: <: несоответствие типов со знаком и без знака
+d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(80): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(84): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(109): warning C4018: <: несоответствие типов со знаком и без знака
+d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(110): warning C4018: <: несоответствие типов со знаком и без знака
+d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(125): warning C4018: <: несоответствие типов со знаком и без знака
+d:\kek_kok_kik\nuar\nuar_start\nuar_start\source.cpp(126): warning C4018: <: несоответствие типов со знаком и без знака
   Nuar_Start.vcxproj -> D:\Kek_Kok_Kik\Nuar\Nuar_Start\Debug\Nuar_Start.exe
   Nuar_Start.vcxproj -> D:\Kek_Kok_Kik\Nuar\Nuar_Start\Debug\Nuar_Start.pdb (Partial PDB)

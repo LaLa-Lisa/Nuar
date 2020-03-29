@@ -5,11 +5,14 @@
 #include <Windows.h>
 #include <fstream>
 
+//класс человека как игрока
 class NPlayer {
 public:
+	//возвращает имя(ник) игрока
 	std::string getName() {
 		return name;
 	}
+	//устанавливает имя(ник) игрока
 	void setName(std::string name0) {
 		name = name0;
 	};
@@ -19,7 +22,7 @@ private:
 	std::string name = "EmptyNick";
 };
 
-
+//класс персонажа игры (может иметь сссылку на своего человека(игрока))
 class NCharacter
 {
 public:
@@ -33,41 +36,45 @@ public:
 	std::string name = "NoName";
 };
 
+//класс колоды
 class NDeck{
 public:
 	//чтение с файла персонажей 
 	//не забывай в каждой функции делать проверку на пустоту колоды (1 или 2)
 	void readCharecters();
+	//перемешиваем колоду
 	void shakeRand();
+	//возвращает верхнюю карту колоды
 	NCharacter giveOne();
 private:
+	//сама колода
 	std::queue<NCharacter> deck;
+	//количество карт в колоде
 	int number;
 };
 
-
+//класс поля(самая жесть). Поле владеет всеми персонажами и выполняет все действия по манипуляции с ними
 class NField {
 public:
-	//opros
+	//заполнить поле персонажами 5*5 6*6 7*7 и тд
 	void FillField(int size) {
+		if (size != 5 && size != 6 && size != 7) { std::cout << "Error, not possible field size (5 6 7)! You entered" << size << "!\n"; system("pause"); }
 		std::ifstream in("Characters.txt");
 		if (!in.is_open()) { std::cout << "Error, Character file is not found!\n"; }
-		field.resize(5);
+		field.resize(size);
 		for (int i = 0; i < size; ++i) {
-			field[i].resize(5);
+			field[i].resize(size);
 			for (int j = 0; j < size; ++j) {
 				in >> field[i][j].name;
 				field[i][j].isSuspect = true;
 			}
 		}
 	}
-
-	void ShakeFieldOF();																										//перемешать поле
+	//перемешать поле
+	void ShakeFieldOF();
+	//Проводит опрос (передаем игрока чтобы при опросе не учитываляс сам игрок) и возвращает имена всех, кто рядом
 	bool Survey(int row, int column, NPlayer& player) {
-		int U = 0;
-		int D = 0;
-		int L = 0;
-		int R = 0;
+		int U, D, L, R = 0;
 		if (row - 1 < 0) { L = 0; }
 		else L = row - 1;
 		if (row + 1 >= field.size()) { R = field.size() - 1; }
@@ -77,21 +84,27 @@ public:
 		if (column + 1 >= field[0].size()) { D = field[0].size() - 1; }
 		else D = column + 1;
 
+		bool isSomeOneHere = false;
 		for (int i = L; i <= R; ++i) {
-
 			for (int j = U; j <= D; ++j) {
 				if ((field[i][j].player != NULL) && (field[i][j].player != &player)) {
 					std::cout << field[i][j].player->getName() << " is here!\n";
-					return true;
+					isSomeOneHere = true;
 				}
 			}
-
 		}
 
-		return false;
+		if (isSomeOneHere) { return true; }
+		else { 
+			std::cout << "Noone is here!\n";
+			return false;
+		}
 	};
+
 	void Kill(int row, int column);
-	bool Choose(int row, int column);																							//tut tыkaut 
+	//tut tыkaut
+	bool Choose(int row, int column);
+	//поле выводит своих персонажей
 	void PrintMe() {
 		for (int i = 0; i < field.size(); ++i) {
 			for (int j = 0; j < field[i].size(); ++j) {
@@ -106,6 +119,7 @@ public:
 	//сделать проверку
 	void Refreash();
 
+	//устанавливает игроку его персонажа (игрок персонажа присваивает себе игрока)
 	void SetPlayerIdentity(NCharacter character, NPlayer* player) {
 
 		for (int i = 0; i < field.size(); ++i) {
@@ -119,15 +133,17 @@ public:
 		std::cout << "Error, Character is not found! :)))\n";
 	}
 private:
+	//само поле персонажей
 	std::vector<std::vector<NCharacter>> field;
+	//общее количество убитых
 	int deadNumber = 0;
 };
 
 
-
-
+//Инспектор (сыщик)
 class Inspector {
 public:
+	//инспектору передается ник игрока, колода чтобы тянуть карты и поле, чтобы найти персонажа на поле
 	Inspector(std::string PersonName, NDeck& deck, NField& field) {
 		if (sizeof(PersonName) >= 1) {
 			originPlayer.setName(PersonName);
@@ -144,7 +160,7 @@ public:
 	void MakeSurvey(int row, int column, NField* field) {
 		field->Survey(row, column, originPlayer);
 	};
-	void Choose(int row, int column, NField& field, NDeck& deck) {
+	void Choose(int row, int column, NField& field, NDeck& deck) {							//зачем передавать колоду???
 		field.Choose(row, column);
 	};
 	void Justify(int row, int column, NField& field) {
@@ -159,11 +175,13 @@ public:
 private:
 	NPlayer originPlayer;
 	NCharacter player;
+	//4 карты в руке - максимум (обычно 3, но когда берешь новую карту из колоды - добавляется 4-я)
 	NCharacter Hand[4];
 };
 
 class Bandit {
 public:
+	//бандиту передается ник игрока, колода чтобы тянуть карту и поле, чтобы найти персонажа на поле
 	Bandit(std::string PersonName, NDeck& deck, NField& field) {
 		if (sizeof(PersonName) >= 1) {
 			originPlayer.setName(PersonName);
@@ -178,10 +196,14 @@ public:
 		field.Kill(row, column);
 	};
 	void Hide(NDeck& deck, NField& field) {
-		
+		field.Hide();
 	};
-	void Move(int row, int column, char dir, NField& field);
-	void Refresh(NField& field);
+	void Move(int row, int column, char dir, NField& field) {
+		field.Move(row, column, dir);
+	};
+	void Refresh(NField& field) {
+		field.Refreash();
+	};
 private:
 	NPlayer originPlayer;
 	NCharacter player;
@@ -190,9 +212,11 @@ private:
 
 class NGame1 {
 public:
+	//вывести текущее поле
 	void printField() {
 		field.PrintMe();
 	}
+	//ход игры
 	void gameRun() {
 		while (!gameOver) {
 			printField();
@@ -202,16 +226,17 @@ public:
 			printField();
 		}
 	}
+
 private:
 	NDeck deck;
 	//заинитить размер и тд в конструкторе игры
 	NField field;
 	//два игрока бандит и детектив (не забудь вызвать у каждого конструктор и соеденить с игроком)
 	NPlayer bandit;
-	NPlayer incpector;
+	NPlayer inspector;
 	bool gameOver = false;
 	//название
-	std::string gameName = "Bandit vs Inspector";
+	std::string gameName = "Bandit vs Inspector\n";
 };
 
 
