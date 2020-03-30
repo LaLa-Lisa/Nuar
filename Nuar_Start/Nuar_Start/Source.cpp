@@ -41,7 +41,7 @@ class NDeck{
 public:
 	//чтение с файла персонажей 
 	//не забывай в каждой функции делать проверку на пустоту колоды (1 или 2)
-	void readCharecters();
+	void readCharacters();
 	//перемешиваем колоду
 	void shakeRand();
 	//возвращает верхнюю карту колоды
@@ -73,7 +73,7 @@ public:
 	//перемешать поле
 	void ShakeFieldOF();
 	//Проводит опрос (передаем игрока чтобы при опросе не учитываляс сам игрок) и возвращает имена всех, кто рядом
-	bool Survey(int row, int column, NPlayer& player) {
+	bool Survey(int row, int column, NPlayer* player) {
 		int U, D, L, R = 0;
 		if (row - 1 < 0) { L = 0; }
 		else L = row - 1;
@@ -87,7 +87,7 @@ public:
 		bool isSomeOneHere = false;
 		for (int i = L; i <= R; ++i) {
 			for (int j = U; j <= D; ++j) {
-				if ((field[i][j].player != NULL) && (field[i][j].player != &player)) {
+				if ((field[i][j].player != NULL) && (field[i][j].player != player)) {
 					std::cout << field[i][j].player->getName() << " is here!\n";
 					isSomeOneHere = true;
 				}
@@ -101,21 +101,140 @@ public:
 		}
 	};
 
-	void Kill(int row, int column);
+	bool Kill(int row, int column, NPlayer* killer) {
+		if (row < 0 ||
+			column < 0 ||
+			row >= field.size() ||
+			column >= field[row].size()
+			)
+		{
+			std::cout << "Character with this coords does not exist!\n";
+			return false;
+		}
+		if(field[row][column].player == killer)
+		{
+			std::cout << "Are you stupid? You'ra trying to kill your self...\n";
+			return false;
+		}
+		if(field[row][column].isDead)
+		{
+			std::cout << "This character are already killed\n";
+			return false;
+		}
+		//cча будет проверочка на то что бы убийца был рядом
+		if (!isNear(row, column, killer))
+		{
+			std::cout << "Killer must be close to victim\n";
+			return false;
+		}
+
+		field[row][column].isDead = true;
+		return true;
+	}
+	// воспомогательная функция для убийств и тыканей 
+	bool isNear(int row, int column, NPlayer* killer) {
+		int U, D, L, R = 0;
+		if (row - 1 < 0) { L = 0; }
+		else L = row - 1;
+		if (row + 1 >= field.size()) { R = field.size() - 1; }
+		else R = row + 1;
+		if (column - 1 < 0) { U = 0; }
+		else U = column - 1;
+		if (column + 1 >= field[0].size()) { D = field[0].size() - 1; }
+		else D = column + 1;
+
+		for (int i = L; i <= R; ++i) 
+			for (int j = U; j <= D; ++j) 
+				if (field[i][j].player == killer) 
+				{
+					return true;
+				}
+		return false;
+	}
 	//tut tыkaut
-	bool Choose(int row, int column);
+	bool Choose(int row, int column, NPlayer* insp)
+	{
+		if (row < 0 ||
+			column < 0 ||
+			row >= field.size() ||
+			column >= field[row].size()
+			)
+		{
+			std::cout << "Character with this coords does not exist!\n";
+			return false;
+		}
+		if (field[row][column].player == insp)
+		{
+			std::cout << "Are you stupid? You'ra trying to kill your self...\n";
+			return false;
+		}
+		if (field[row][column].player != NULL)
+			return true;
+		return false;
+	}
 	//поле выводит своих персонажей
 	void PrintMe() {
 		for (int i = 0; i < field.size(); ++i) {
 			for (int j = 0; j < field[i].size(); ++j) {
+				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+				SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+				if (field[i][j].isJustified) 
+				{
+					SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 3));
+				}
+				else 
+				{
+					if(field[i][j].isDead)
+						SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 4));
+				}
 				std::cout.width(20);
 				std::cout << field[i][j].name << " ";
 			}
 			std::cout << "\n\n";
 		}
 	};
-	void Hide();
-	void Justify(int row, int column);
+	void Hide(NCharacter newC, NPlayer* player) {
+		for(int i = 0; i < field.size(); i++)
+			for (int j = 0; j < field[i].size(); j++)
+			{
+				if(field[i][j].player == player)
+				{
+					field[i][j].player = NULL;
+					field[i][j].isJustified = true;
+				}
+				if (field[i][j].name == newC.name)
+					field[i][j].player = player;
+			}
+	}
+	bool Justify(int row, int column, NPlayer* insp)
+	{
+		if (row < 0 ||
+			column < 0 ||
+			row >= field.size() ||
+			column >= field[row].size()
+			)
+		{
+			std::cout << "Character with this coords does not exist!\n";
+			return false;
+		}
+		if (field[row][column].player == insp)
+		{
+			std::cout << "Are you stupid? You'ra trying to justified your self...\n";
+			return false;
+		}
+		if (field[row][column].isDead)
+		{
+			std::cout << "This character are already killed\n";
+			return false;
+		}
+		if (field[row][column].isJustified)
+		{
+			std::cout << "This character are already justified\n";
+			return false;
+		}
+		field[row][column].isJustified = true;
+		return Survey(row, column, insp);
+	}
 	void Move(int row, int column, char dir);
 	//сделать проверку
 	void Refreash();
@@ -159,13 +278,13 @@ public:
 	}
 
 	void MakeSurvey(int row, int column, NField* field) {
-		field->Survey(row, column, originPlayer);
+		field->Survey(row, column, &originPlayer);
 	};
 	void Choose(int row, int column, NField& field, NDeck& deck) {							//зачем передавать колоду???
-		field.Choose(row, column);
+		field.Choose(row, column, &originPlayer);
 	};
 	void Justify(int row, int column, NField& field) {
-		field.Justify(row, column);
+		field.Justify(row, column, &originPlayer);
 	};
 	void Move(int row, int column, char dir, NField& field) {
 		field.Move(row, column, dir);
@@ -193,11 +312,13 @@ public:
 		else std::cout << "Error, Wrong name\n";
 	}
 
-	void Kill(int row, int column, NField& field) {
-		field.Kill(row, column);
-	};
+	//возвращает true если убийство успешно
+	bool Kill(int row, int column, NField& field) {
+		return field.Kill(row, column, &originPlayer);
+	}
 	void Hide(NDeck& deck, NField& field) {
-		field.Hide();
+		player = deck.giveOne();
+		field.Hide(player, &originPlayer);
 	};
 	void Move(int row, int column, char dir, NField& field) {
 		field.Move(row, column, dir);
@@ -246,10 +367,10 @@ int main() {
 
 	NField F;
 	F.FillField(5);
-	F.PrintMe();
+	//F.PrintMe();
 
 	int g, d;
-	std::cin >> g >> d;
+	//std::cin >> g >> d;
 
 	NCharacter CharLina;
 	CharLina.name = "Клара";
@@ -261,7 +382,10 @@ int main() {
 	Lesha.setName("Леха-Лепеха");
 	F.SetPlayerIdentity(CharLina, &Lina);
 	F.SetPlayerIdentity(CharLesha, &Lesha);
-	F.Survey(g, d, Lesha);
+	F.Kill(1, 1, &Lina);
+	F.Justify(0, 1, &Lesha);
+	//F.Survey(g, d, &Lesha);
+	F.PrintMe();
 
 
 
