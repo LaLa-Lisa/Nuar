@@ -4,6 +4,7 @@
 #include <string>
 #include <Windows.h>
 #include <fstream>
+#include <ctime>
 
 //класс человека как игрока
 class NPlayer {
@@ -41,11 +42,43 @@ class NDeck{
 public:
 	//чтение с файла персонажей 
 	//не забывай в каждой функции делать проверку на пустоту колоды (1 или 2)
-	void readCharacters();
+	void readCharacters(std::string filename, int size) {
+		if (size != 5 && size != 6 && size != 7) { std::cout << "Error, not possible game size (5 6 7)! You entered" << size << "!\n"; system("pause"); }
+		std::ifstream in(filename);
+		if (!in.is_open()) { std::cout << "Error, Character file is not found!\n"; system("pause"); }
+		if (!deck.empty()) { std::cout << "Warning, deck is not empty! Can be mistakes!\n"; system("pause"); }
+		//засовываем в колоду персонажей из файла сразу оправданных
+		for (int i = 0; i < size*size; ++i) {
+			NCharacter buf;
+			in >> buf.name;
+			deck.push(buf);
+		}
+		in.close();
+	};
 	//перемешиваем колоду
-	void shakeRand();
+	void shakeRand() {
+		std::vector<NCharacter> buffer;
+		int ssizeDeck = deck.size();
+		for (int i = 0; i < ssizeDeck; ++i) {
+			buffer.push_back(deck.front());
+			deck.pop();
+		}
+
+		//std::default_random_engine dre(time(NULL));
+		std::random_shuffle(buffer.begin(), buffer.end());
+
+		for (int i = 0; i < ssizeDeck; ++i) {
+			deck.push(buffer.back());
+			buffer.pop_back();
+		}
+	};
+
 	//возвращает верхнюю карту колоды
-	NCharacter giveOne();
+	NCharacter giveOne() {
+		NCharacter buf = deck.front();
+		deck.pop();
+		return buf;
+	};
 private:
 	//сама колода
 	std::queue<NCharacter> deck;
@@ -363,7 +396,22 @@ private:
 
 
 int main() {
+	srand(time(NULL));
 	setlocale(LC_ALL, "Russian");
+
+	NDeck aaa;
+	std::string SSS = "Characters.txt";
+	aaa.readCharacters(SSS, 5);
+	aaa.shakeRand();
+	std::cout << aaa.giveOne().name << "\n";
+	std::cout << aaa.giveOne().name << "\n";
+	std::cout << aaa.giveOne().name << "\n";
+	std::cout << aaa.giveOne().name << "\n";
+	std::cout << aaa.giveOne().name << "\n";
+	std::cout << aaa.giveOne().name << "\n";
+
+
+
 
 	NField F;
 	F.FillField(5);
