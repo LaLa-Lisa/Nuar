@@ -75,10 +75,21 @@ public:
 
 	//возвращает верхнюю карту колоды
 	NCharacter giveOne() {
-		NCharacter buf = deck.front();
-		deck.pop();
-		return buf;
+		if (!deck.empty()) {
+			NCharacter buf = deck.front();
+			deck.pop();
+			return buf;
+		}
+		else { 
+			std::cout << "Error, No cards!\n";
+			NCharacter buf;
+			return buf;
+		}
 	};
+
+	int deckSize() {
+		return deck.size();
+	}
 private:
 	//сама колода
 	std::queue<NCharacter> deck;
@@ -102,6 +113,7 @@ public:
 				field[i][j].isSuspect = true;
 			}
 		}
+		in.close();
 	}
 	//перемешать поле
 	void ShakeFieldOF();
@@ -300,8 +312,10 @@ public:
 	Inspector(std::string PersonName, NDeck& deck, NField& field) {
 		if (sizeof(PersonName) >= 1) {
 			originPlayer.setName(PersonName);
+			if (deck.deckSize() < 1) { std::cout << "Error, NoName\n"; system("pause"); }
 			player = deck.giveOne();
 			for (int i = 0; i < 3; ++i) {
+				if (deck.deckSize() < 1) { std::cout << "Error, NoName\n"; system("pause"); }
 				Hand[i] = deck.giveOne();
 			}
 
@@ -338,6 +352,7 @@ public:
 	Bandit(std::string PersonName, NDeck& deck, NField& field) {
 		if (sizeof(PersonName) >= 1) {
 			originPlayer.setName(PersonName);
+			if (deck.deckSize() < 1) { std::cout << "Error, NoName\n"; system("pause"); }
 			player = deck.giveOne();
 
 			field.SetPlayerIdentity(player, &originPlayer);
@@ -349,9 +364,11 @@ public:
 	bool Kill(int row, int column, NField& field) {
 		return field.Kill(row, column, &originPlayer);
 	}
-	void Hide(NDeck& deck, NField& field) {
+	bool Hide(NDeck& deck, NField& field) {
+		if (deck.deckSize() < 1) { std::cout << "Error, no cards\n"; return false; }
 		player = deck.giveOne();
 		field.Hide(player, &originPlayer);
+		return true;
 	};
 	void Move(int row, int column, char dir, NField& field) {
 		field.Move(row, column, dir);
