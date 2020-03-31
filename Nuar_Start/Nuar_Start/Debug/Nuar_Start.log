@@ -1,21 +1,20 @@
 ﻿  Source.cpp
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(125): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(129): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(152): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(126): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(130): warning C4018: >=: несоответствие типов со знаком и без знака
 d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(153): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(184): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(188): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(204): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(154): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(185): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(189): warning C4018: >=: несоответствие типов со знаком и без знака
 d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(205): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(222): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(206): warning C4018: >=: несоответствие типов со знаком и без знака
 d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(223): warning C4018: <: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(242): warning C4018: <: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(243): warning C4018: <: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(258): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(259): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(290): warning C4018: <: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(291): warning C4018: <: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(416): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(437): warning C4101: g: неиспользованная локальная переменная
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(437): warning C4101: d: неиспользованная локальная переменная
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(224): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(246): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(247): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(267): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(268): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(299): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(300): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(449): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(262): warning C4715: NField::Hide: значение возвращается не при всех путях выполнения
   Nuar_Start.vcxproj -> D:\МойГит\Nuar\Nuar_Start\Debug\Nuar_Start.exe

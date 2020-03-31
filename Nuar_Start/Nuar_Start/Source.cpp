@@ -78,6 +78,7 @@ public:
 		if (!deck.empty()) {
 			NCharacter buf = deck.front();
 			deck.pop();
+			std::cout << "Выдано:" << buf.name << "\n";
 			return buf;
 		}
 		else { 
@@ -238,18 +239,26 @@ public:
 			std::cout << "\n\n";
 		}
 	};
-	void Hide(NCharacter newC, NPlayer* player) {
-		for(int i = 0; i < field.size(); i++)
+	bool Hide(NCharacter newC, NPlayer* player, NDeck &deck, NCharacter &player2) {
+		if (deck.deckSize() < 1) { std::cout << "Error, no cards\n"; }
+		player2 = deck.giveOne();
+		bool changedPer = false;
+		for (int i = 0; i < field.size(); i++) {
 			for (int j = 0; j < field[i].size(); j++)
 			{
-				if(field[i][j].player == player)
+				if (field[i][j].name == newC.name) {
+					if (field[i][j].isDead) { return false; }
+					field[i][j].player = player;
+					changedPer = true;
+				}
+				if (field[i][j].player == player && changedPer)
 				{
 					field[i][j].player = NULL;
 					field[i][j].isJustified = true;
+					return true;
 				}
-				if (field[i][j].name == newC.name)
-					field[i][j].player = player;
 			}
+		}
 	}
 	bool Justify(int row, int column, NPlayer* insp)
 	{
@@ -364,11 +373,9 @@ public:
 	bool Kill(int row, int column, NField& field) {
 		return field.Kill(row, column, &originPlayer);
 	}
-	bool Hide(NDeck& deck, NField& field) {
-		if (deck.deckSize() < 1) { std::cout << "Error, no cards\n"; return false; }
-		player = deck.giveOne();
-		field.Hide(player, &originPlayer);
-		return true;
+	void Hide(NDeck& deck, NField& field) {
+		if (field.Hide(player, &originPlayer, deck, player)) {}
+		else { std::cout << "Персонаж из колоды уже мертв!\n"; };
 	};
 	void Move(int row, int column, char dir, NField& field) {
 		field.Move(row, column, dir);
@@ -390,12 +397,36 @@ public:
 	}
 	//ход игры
 	void gameRun() {
+		std::string SSS = "Characters.txt";
+		deck.readCharacters(SSS, 5);
+		deck.shakeRand();
+		field.FillField(5);
+		Bandit bandit("Alex", deck, field);
+		Inspector inspector("Lesha", deck, field);
+
 		while (!gameOver) {
+			using std::cout;
+			using std::cin;
+
 			printField();
 			//ход бандита (ввод действия от игрока) (если кто-то умирает пишешь break)
+			cout << "Ход Бандита\n";
+			int choose,x,y;
+			cin >> choose;
+			switch (choose) {
+			case 1: cout << "Введите координаты убиваемого\n"; cin >> x; cin >> y; bandit.Kill(x, y, field); break;
+			case 2: cout << "Прячемся\n"; bandit.Hide(deck, field); break;
+			}
 			printField();
 			//ход инспектора (ввод действия от игрока)
+			cout << "Ход Инспектора\n";
+			cin >> choose;
+			switch (choose) {
+			case 1: cout << "Введите координаты убиваемого\n"; cin >> x; cin >> y; inspector.Choose(x, y, field, deck); break;
+			case 2: cout << "Оправдываем\n"; cin >> x; cin >> y; inspector.Justify(x, y, field); break;
+			}
 			printField();
+			//тут должно быть условие на то не мерт ли бандит, но это сложно
 		}
 	}
 
@@ -404,8 +435,10 @@ private:
 	//заинитить размер и тд в конструкторе игры
 	NField field;
 	//два игрока бандит и детектив (не забудь вызвать у каждого конструктор и соеденить с игроком)
-	NPlayer bandit;
-	NPlayer inspector;
+	//NPlayer bandit;
+	//NPlayer inspector;
+	//Bandit bandit("sd", deck, field);
+	//Inspector inspector;
 	bool gameOver = false;
 	//название
 	std::string gameName = "Bandit vs Inspector\n";
@@ -416,6 +449,9 @@ int main() {
 	srand(time(NULL));
 	setlocale(LC_ALL, "Russian");
 
+	NGame1 a;
+	a.gameRun();
+	/*
 	NDeck aaa;
 	std::string SSS = "Characters.txt";
 	aaa.readCharacters(SSS, 5);
@@ -459,6 +495,7 @@ int main() {
 	std::cout << "hello world\n";
 	SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
 	std::cout << "fuck you\n";
+	*/
 	system("pause");
 	return 0;
 }
