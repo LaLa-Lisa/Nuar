@@ -240,9 +240,9 @@ public:
 			std::cout << "\n\n";
 		}
 	};
-	bool Hide(NCharacter newC, NPlayer* player, NDeck &deck, NCharacter &player2) {
+	bool Hide(NCharacter &old, NPlayer* player, NDeck &deck) {
 		if (deck.deckSize() < 1) { std::cout << "Error, no cards\n"; }
-		player2 = deck.giveOne();
+		NCharacter newC = deck.giveOne();
 		bool changedPer = false;
 		for (int i = 0; i < field.size(); i++) {
 			for (int j = 0; j < field[i].size(); j++)
@@ -252,7 +252,12 @@ public:
 					field[i][j].player = player;
 					changedPer = true;
 				}
-				if (field[i][j].player == player && changedPer)
+			}
+		}
+		for (int i = 0; i < field.size(); i++) {
+			for (int j = 0; j < field[i].size(); j++)
+			{
+				if (field[i][j].name == old.name && changedPer)
 				{
 					field[i][j].player = NULL;
 					field[i][j].isJustified = true;
@@ -378,7 +383,7 @@ public:
 		return field.Kill(row, column, &originPlayer);
 	}
 	void Hide(NDeck& deck, NField& field) {
-		field.Hide(player, &originPlayer, deck, player);
+		field.Hide(player, &originPlayer, deck);
 	};
 	void Move(int row, int column, char dir, NField& field) {
 		field.Move(row, column, dir);
