@@ -15,8 +15,17 @@ d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(257): warning C4018: <: н
 d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(258): warning C4018: <: несоответствие типов со знаком и без знака
 d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(273): warning C4018: >=: несоответствие типов со знаком и без знака
 d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(274): warning C4018: >=: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(305): warning C4018: <: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(306): warning C4018: <: несоответствие типов со знаком и без знака
-d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(463): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(300): warning C4018: >=: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(304): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(309): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(316): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(321): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(327): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(332): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(339): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(344): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(356): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(357): warning C4018: <: несоответствие типов со знаком и без знака
+d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(519): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
 d:\мойгит\nuar\nuar_start\nuar_start\source.cpp(268): warning C4715: NField::Hide: значение возвращается не при всех путях выполнения
   Nuar_Start.vcxproj -> D:\МойГит\Nuar\Nuar_Start\Debug\Nuar_Start.exe

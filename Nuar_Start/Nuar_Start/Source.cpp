@@ -295,7 +295,58 @@ public:
 		field[row][column].isJustified = true;
 		return Survey(row, column, insp);
 	}
-	void Move(int row, int column, char dir);
+	bool Move(int row, int column, char dir) {
+		if (dir != 'u' && dir != 'd' && dir != 'l' && dir != 'r') { std::cout << "Error, Wrong direction (u d l r)"; return false; }
+		if (row < 0 || column < 0 || row >= field.size() || column >= field[row].size()) { std::cout << "Character with this coords does not exist!\n"; return false; }
+		std::vector<NCharacter> buff;
+		if (dir == 'u' || dir == 'd') {
+			buff.resize(field.size());
+			for (int i = 0; i < buff.size(); ++i) {
+				buff[i] = field[i][column];
+			}
+			if (dir == 'u') {
+				NCharacter buffer = buff.front();
+				for (int i = 0; i < buff.size()-1; ++i) {
+					buff[i] = buff[i+1];
+				}
+				buff.back() = buffer;
+			}
+			if (dir == 'd') {
+				NCharacter buffer = buff.back();
+				for (int i = 1; i < buff.size(); ++i) {
+					buff[i] = buff[i - 1];
+				}
+				buff.front() = buffer;
+			}
+			for (int i = 0; i < buff.size(); ++i) {
+				field[i][column] = buff[i];
+			}
+		}
+		if (dir == 'l' || dir == 'r') {
+			buff.resize(field[0].size());
+			for (int i = 0; i < buff.size(); ++i) {
+				buff[i] = field[row][i];
+			}
+			if (dir == 'l') {
+				NCharacter buffer = buff.front();
+				for (int i = 0; i < buff.size() - 1; ++i) {
+					buff[i] = buff[i + 1];
+				}
+				buff.back() = buffer;
+			}
+			if (dir == 'r') {
+				NCharacter buffer = buff.back();
+				for (int i = 1; i < buff.size(); ++i) {
+					buff[i] = buff[i - 1];
+				}
+				buff.front() = buffer;
+			}
+			for (int i = 0; i < buff.size(); ++i) {
+				field[row][i] = buff[i];
+			}
+		}
+		return true;
+	};
 	//сделать проверку
 	void Refreash();
 
@@ -345,11 +396,11 @@ public:
 	bool Choose(int row, int column, NField& field, NDeck& deck) {							//зачем передавать колоду???
 		return field.Choose(row, column, &originPlayer);
 	};
-	void Justify(int row, int column, NField& field) {
-		field.Justify(row, column, &originPlayer);
+	bool Justify(int row, int column, NField& field) {
+		return field.Justify(row, column, &originPlayer);
 	};
-	void Move(int row, int column, char dir, NField& field) {
-		field.Move(row, column, dir);
+	bool Move(int row, int column, char dir, NField& field) {
+		return field.Move(row, column, dir);
 	};
 	void Refresh(NField& field) {
 		field.Refreash();
@@ -382,11 +433,11 @@ public:
 	bool Kill(int row, int column, NField& field) {
 		return field.Kill(row, column, &originPlayer);
 	}
-	void Hide(NDeck& deck, NField& field) {
-		field.Hide(player, &originPlayer, deck);
+	bool Hide(NDeck& deck, NField& field) {
+		return field.Hide(player, &originPlayer, deck);
 	};
-	void Move(int row, int column, char dir, NField& field) {
-		field.Move(row, column, dir);
+	bool Move(int row, int column, char dir, NField& field) {
+		return field.Move(row, column, dir);
 	};
 	void Refresh(NField& field) {
 		field.Refreash();
@@ -425,19 +476,24 @@ public:
 			//ход бандита (ввод действия от игрока) (если кто-то умирает пишешь break)
 			cout << "Ход Бандита\n";
 			int choose,x,y;
+			char updown;
 			cin >> choose;
+			again1:
 			switch (choose) {
-			case 1: cout << "Введите координаты убиваемого\n"; cin >> x; cin >> y; bandit.Kill(x, y, field); break;
-			case 2: cout << "Прячемся\n"; bandit.Hide(deck, field); break;
+			case 1: cout << "Введите координаты убиваемого\n"; cin >> x; cin >> y; if (!bandit.Kill(x, y, field)) { goto again1; }; break;
+			case 2: cout << "Прячемся\n"; if (!bandit.Hide(deck, field)) { goto again1; } break;
+			case 3: cout << "Двигаем\n"; cin >> x; cin >> y; cin >> updown; if (!bandit.Move(x, y, updown, field)) { goto again1; }; break;
 			}
 			printField();
 			if (inspector.ISDEAD()) { gameOver = true; cout << "Game Over! Bandit" << name1 << "Wins!\n"; system("pause"); }
 			//ход инспектора (ввод действия от игрока)
 			cout << "Ход Инспектора\n";
 			cin >> choose;
+			again2:
 			switch (choose) {
-			case 1: cout << "Введите координаты убиваемого\n"; cin >> x; cin >> y; inspector.Choose(x, y, field, deck); break;
-			case 2: cout << "Оправдываем\n"; cin >> x; cin >> y; inspector.Justify(x, y, field); break;
+			case 1: cout << "Введите координаты убиваемого\n"; cin >> x; cin >> y; if (!inspector.Choose(x, y, field, deck)) { goto again2; } break;
+			case 2: cout << "Оправдываем\n"; cin >> x; cin >> y; if (!inspector.Justify(x, y, field)) { goto again2; } break;
+			case 3: cout << "Двигаем\n"; cin >> x; cin >> y; cin >> updown; if (!inspector.Move(x, y, updown, field)) { goto again2; }; break;
 			}
 			printField();
 			if (bandit.ISDEAD()) { gameOver = true; cout << "Game Over! Inspector" << name2 << "Wins!\n"; system("pause"); }
