@@ -216,6 +216,7 @@ public:
 		}
 		if (field[row][column].player != NULL)
 			return true;
+		std::cout << "Mistake\n";
 		return false;
 	}
 	//поле выводит своих персонажей
@@ -247,7 +248,7 @@ public:
 			for (int j = 0; j < field[i].size(); j++)
 			{
 				if (field[i][j].name == newC.name) {
-					if (field[i][j].isDead) { return false; }
+					if (field[i][j].isDead) { std::cout << "Персонаж из колоды уже мертв!\n"; return false; }
 					field[i][j].player = player;
 					changedPer = true;
 				}
@@ -336,8 +337,8 @@ public:
 	void MakeSurvey(int row, int column, NField* field) {
 		field->Survey(row, column, &originPlayer);
 	};
-	void Choose(int row, int column, NField& field, NDeck& deck) {							//зачем передавать колоду???
-		field.Choose(row, column, &originPlayer);
+	bool Choose(int row, int column, NField& field, NDeck& deck) {							//зачем передавать колоду???
+		return field.Choose(row, column, &originPlayer);
 	};
 	void Justify(int row, int column, NField& field) {
 		field.Justify(row, column, &originPlayer);
@@ -348,6 +349,9 @@ public:
 	void Refresh(NField& field) {
 		field.Refreash();
 	};
+	bool ISDEAD() {
+		return player.isDead;
+	}
 private:
 	NPlayer originPlayer;
 	NCharacter player;
@@ -374,8 +378,7 @@ public:
 		return field.Kill(row, column, &originPlayer);
 	}
 	void Hide(NDeck& deck, NField& field) {
-		if (field.Hide(player, &originPlayer, deck, player)) {}
-		else { std::cout << "Персонаж из колоды уже мертв!\n"; };
+		field.Hide(player, &originPlayer, deck, player);
 	};
 	void Move(int row, int column, char dir, NField& field) {
 		field.Move(row, column, dir);
@@ -383,6 +386,9 @@ public:
 	void Refresh(NField& field) {
 		field.Refreash();
 	};
+	bool ISDEAD() {
+		return player.isDead;
+	}
 private:
 	NPlayer originPlayer;
 	NCharacter player;
@@ -401,8 +407,10 @@ public:
 		deck.readCharacters(SSS, 5);
 		deck.shakeRand();
 		field.FillField(5);
-		Bandit bandit("Alex", deck, field);
-		Inspector inspector("Lesha", deck, field);
+		std::string name1 = "Alex";
+		std::string name2 = "Lesha";
+		Bandit bandit(name1, deck, field);
+		Inspector inspector(name2, deck, field);
 
 		while (!gameOver) {
 			using std::cout;
@@ -418,6 +426,7 @@ public:
 			case 2: cout << "Прячемся\n"; bandit.Hide(deck, field); break;
 			}
 			printField();
+			if (inspector.ISDEAD()) { gameOver = true; cout << "Game Over! Bandit" << name1 << "Wins!\n"; system("pause"); }
 			//ход инспектора (ввод действия от игрока)
 			cout << "Ход Инспектора\n";
 			cin >> choose;
@@ -426,7 +435,7 @@ public:
 			case 2: cout << "Оправдываем\n"; cin >> x; cin >> y; inspector.Justify(x, y, field); break;
 			}
 			printField();
-			//тут должно быть условие на то не мерт ли бандит, но это сложно
+			if (bandit.ISDEAD()) { gameOver = true; cout << "Game Over! Inspector" << name2 << "Wins!\n"; system("pause"); }
 		}
 	}
 
