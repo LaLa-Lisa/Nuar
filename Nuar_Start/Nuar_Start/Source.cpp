@@ -17,10 +17,160 @@ public:
 	void setName(std::string name0) {
 		name = name0;
 	};
+	bool isDead = false;
 private:
 	//NCharacter self;
-	bool isDead = false;
 	std::string name = "EmptyNick";
+};
+
+//смэрть
+class NClient {
+public:
+	//тут определяется личность (инспектор/бандит)
+	std::string init(std::string inRole) {
+		//проверка на пустоту
+		if (sizeof(inRole) < 1) return "err1";
+		if (inRole != "Inspector" && inRole != "Bandit") return "err2";
+		if (inRole == "Bandit") role = BANDIT;
+		return "ok";
+	};
+	//тут клиент делает ход 
+	std::string makeStep(std::string inMassege) {
+		using std::cin;
+		using std::cout;
+
+		std::string ans = "";
+
+		char choose, x, y, updown;
+		cout << inMassege << "\n";
+		cin >> choose;
+		switch (choose) {
+		case '1': {
+			cout << "Введите координаты\n";
+			cin >> x;
+			cin >> y;
+			ans = '1';
+			ans.push_back(x);
+			ans.push_back(y);
+			break;
+		}
+		case '2': {
+			switch (role) {
+			case INSPECTOR: 
+			{
+				cout << "Oправдываем\n";
+				cin >> x; 
+				cin >> y;
+				ans = '2';
+				ans.push_back(x);
+				ans.push_back(y);
+				break;
+			}
+			case BANDIT: 
+			{
+				cout << "Прячемся\n";
+				ans = '2';
+				break;
+			}
+			}
+			break;
+		}
+		case '3': {
+			cout << "Двигаем\n";
+			cin >> x;
+			cin >> y;
+			cin >> updown;
+			ans = '3';
+			ans.push_back(x);
+			ans.push_back(y);
+			ans.push_back(updown);
+			break;
+		}
+		}
+		return ans;
+	};
+	//тут у клиента выводится поле в консоль 
+	std::string printField(std::string inField) {
+		//проверка на пустоту
+		if (sizeof(inField) < 1) return "err1";
+		//проверка корректности строки
+		if (inField[0] != '%' ||
+			inField[inField.size() - 1] != '%')
+			return "err2";
+		//итератор что бы бегать по строке
+		int iter = 0;
+		for (int i = 0; i < fieldSizeY; i++) 
+		{
+			for (int j = 0; j < fieldSizeX; j++) 
+			{
+				std::string color = "";
+				std::string name = "";
+				iter++;
+				if (iter >= inField.size()) return "err3";
+				//считываем имя персонажа
+				while (inField[iter] != '%')
+				{
+					name.push_back(inField[iter]);
+					iter++;
+					if (iter >= inField.size()) return "err4";
+				}
+				iter++;
+				if (iter >= inField.size()) return "err5";
+				//считываем цвет 
+				while (inField[iter] != '%') 
+				{
+					color.push_back(inField[iter]);
+					iter++;
+					if (iter >= inField.size()) return "err6";
+				}
+				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+				if(color == "red") SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 4));
+				if (color == "blue") SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 3));
+				if (color == "white") SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+				std::cout.width(20);
+				std::cout << name << " ";
+				//что бы оно остальной текст цветным не херачило 
+				SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+			}
+			std::cout << "\n\n";
+		}
+		return "ok";
+	};
+	//меняются размеры поля 
+	std::string fieldReSize(std::string inSize){
+		//проверка на пустоту
+		if (sizeof(inSize) < 1) return "err1";
+		//проверка корректности строки
+		if (inSize[0] != '%' ||
+			inSize[inSize.size() - 1] != '%')
+			return "err3";
+		int iter = 0;
+		std::string Xsize = "";
+		while (inSize[iter] != '%')
+		{
+			Xsize.push_back(inSize[iter]);
+			iter++;
+			if (iter >= inSize.size()) return "err3";
+		}
+		iter++;
+		if (iter >= inSize.size()) return "err4";
+		std::string Ysize = "";
+		while (inSize[iter] != '%')
+		{
+			Ysize.push_back(inSize[iter]);
+			iter++;
+			if (iter >= inSize.size()) return "err5";
+		}
+		fieldSizeX = std::stoi(Xsize);
+		fieldSizeY = std::stoi(Ysize);
+	}
+private:
+	enum who_0 {INSPECTOR, BANDIT};
+	//пусть по умолчанию клиент будет инспектором
+	who_0 role = INSPECTOR;
+	//по умолчанию поле 5 на 5
+	int fieldSizeX = 5;
+	int fieldSizeY = 5;
 };
 
 //класс персонажа игры (может иметь сссылку на своего человека(игрока))
@@ -174,6 +324,8 @@ public:
 			return false;
 		}
 
+		if (field[row][column].player != NULL)
+			field[row][column].player->isDead = true;
 		field[row][column].isDead = true;
 		return true;
 	}
@@ -216,7 +368,7 @@ public:
 		}
 		if (!isNear(row, column, insp)) {std::cout << "Inspector must be close to victim!\n"; return false;}
 		if (field[row][column].player != NULL) {
-			field[row][column].isDead = true;
+			field[row][column].player->isDead = true;
 			return true;
 		}
 		std::cout << "Mistake\n";
@@ -243,15 +395,17 @@ public:
 			std::cout << "\n\n";
 		}
 	};
-	bool Hide(NCharacter &old, NPlayer* player, NDeck &deck) {
-		if (deck.deckSize() < 1) { std::cout << "Error, no cards\n"; return false; }	//очень зудое место, исправить
-		NCharacter newC = deck.giveOne();
+	bool Hide(NCharacter &old, NCharacter& newC, NPlayer* player) {
 		bool changedPer = false;
 		for (int i = 0; i < field.size(); i++) {
 			for (int j = 0; j < field[i].size(); j++)
 			{
 				if (field[i][j].name == newC.name) {
-					if (field[i][j].isDead) { std::cout << "Персонаж из колоды уже мертв!\n"; return true; }
+					if (field[i][j].isDead) 
+					{ 
+						std::cout << "Персонаж из колоды уже мертв!\n"; 
+						return true; 
+					}
 					field[i][j].player = player;
 					changedPer = true;
 				}
@@ -303,7 +457,11 @@ public:
 			std::cout << "Error, Wrong direction (u d l r)";
 			return false;
 		}
-		if (row < 0 || column < 0 || row >= field.size() || column >= field[row].size()) { 
+		if (row < 0 || column < 0 || 
+			row >= field.size() || 
+			column >= field[row].size()
+			) 
+		{ 
 			std::cout << "Character with this coords does not exist!\n";
 			return false;
 		}
@@ -358,7 +516,55 @@ public:
 		return true;
 	};
 	//сделать проверку
-	void Refreash();
+	void Refreash(NClient* client) {
+		int columnNum = 0;	bool columnCan;
+		int rowNum = 0;	bool rowCan;
+		for (int i = 0; i < field.size(); i++) 
+		{
+			columnCan = false;
+			for (int j = 0; j < field[i].size(); j++) 
+			{
+				if (!columnCan && field[i][j].isDead == true) 
+				{
+					columnNum++;
+					columnCan = true;
+				}
+			}
+		}
+		for (int i = 0; i < field[0].size(); i++)
+		{
+			rowCan = false;
+			for (int j = 0; j < field.size(); j++)
+			{
+				if (!rowCan && field[j][i].isDead == true)
+				{
+					rowNum++;
+					rowCan = true;
+				}
+			}
+		}
+		if (rowNum == field.size()) {
+			
+			for (int i = 0; i < field.size(); i++)
+			{
+				std::vector<NCharacter> temp(field.size());
+				columnCan = false;
+				for (int j = 0; j < field[i].size(); j++)
+				{
+					if (!columnCan && field[i][j].isDead == true)
+					{
+						columnCan = true;
+					}
+					else 
+					{
+						temp.push_back(field[i][j]);
+					}
+				}
+				field[i] = temp;
+			}
+		}
+		client->fieldReSize(std::to_string(field.size()) + "%" + std::to_string(field[0].size()) + "%");
+	};
 
 	//устанавливает игроку его персонажа (игрок персонажа присваивает себе игрока)
 	void SetPlayerIdentity(NCharacter character, NPlayer* player) {
@@ -373,6 +579,26 @@ public:
 		}
 		std::cout << "Error, Character is not found! :)))\n";
 	}
+	std::string sendNoods() {
+		std::string outp = "%";
+		for (int i = 0; i < field.size(); ++i) {
+			for (int j = 0; j < field[i].size(); ++j) {
+				outp += field[i][j].name;
+				if (field[i][j].isDead)
+				{
+					outp += "%red%";
+				}
+				else
+				{
+					if (field[i][j].isJustified)
+						outp += "%blue%";
+					else
+						outp += "%white%";
+				}
+			}
+		}
+		return outp;
+	}
 private:
 	//само поле персонажей
 	std::vector<std::vector<NCharacter>> field;
@@ -380,22 +606,32 @@ private:
 	int deadNumber = 0;
 };
 
-
 //Инспектор (сыщик)
 class Inspector {
 public:
 	//инспектору передается ник игрока, колода чтобы тянуть карты и поле, чтобы найти персонажа на поле
-	Inspector(std::string PersonName, NDeck& deck, NField& field) {
+	Inspector(std::string PersonName, NDeck& deck, NField& field, NClient* client0) {
 		if (sizeof(PersonName) >= 1) {
 			originPlayer.setName(PersonName);
-			if (deck.deckSize() < 1) { std::cout << "Error, NoName\n"; system("pause"); }
+			if (deck.deckSize() < 1) 
+			{ 
+				std::cout << "Error, NoName\n"; 
+				system("pause"); 
+			}
 			player = deck.giveOne();
-			for (int i = 0; i < 3; ++i) {
-				if (deck.deckSize() < 1) { std::cout << "Error, NoName\n"; system("pause"); }
+			for (int i = 0; i < 3; ++i) 
+			{
+				if (deck.deckSize() < 1)
+				{ 
+					std::cout << "Error, NoName\n"; 
+					system("pause"); 
+				}
 				Hand[i] = deck.giveOne();
 			}
 
 			field.SetPlayerIdentity(player, &originPlayer);
+
+			client = client0;
 		}
 		else std::cout << "Error, Wrong name\n";
 	}
@@ -413,14 +649,16 @@ public:
 		return field.Move(row, column, dir);
 	};
 	void Refresh(NField& field) {
-		field.Refreash();
+		//field.Refreash();
 	};
 	bool ISDEAD() {
-		return player.isDead;
+		return originPlayer.isDead;
 	}
+	NClient* client;
 private:
 	NPlayer originPlayer;
 	NCharacter player;
+	
 	//4 карты в руке - максимум (обычно 3, но когда берешь новую карту из колоды - добавляется 4-я)
 	NCharacter Hand[4];
 };
@@ -428,15 +666,17 @@ private:
 class Bandit {
 public:
 	//бандиту передается ник игрока, колода чтобы тянуть карту и поле, чтобы найти персонажа на поле
-	Bandit(std::string PersonName, NDeck& deck, NField& field) {
+	Bandit(std::string PersonName, NDeck& deck, NField& field, NClient* client0) {
 		if (sizeof(PersonName) >= 1) {
 			originPlayer.setName(PersonName);
 			if (deck.deckSize() < 1) { std::cout << "Error, NoName\n"; system("pause"); }
 			player = deck.giveOne();
 
 			field.SetPlayerIdentity(player, &originPlayer);
+			client = client0;
 		}
 		else std::cout << "Error, Wrong name\n";
+
 	}
 
 	//возвращает true если убийство успешно
@@ -444,20 +684,30 @@ public:
 		return field.Kill(row, column, &originPlayer);
 	}
 	bool Hide(NDeck& deck, NField& field) {
-		return field.Hide(player, &originPlayer, deck);
+		if (deck.deckSize() < 1)
+		{
+			std::cout << "Error, no cards\n";
+			return false;
+		}	//очень зудое место, исправить
+		NCharacter old = player;
+		player = deck.giveOne();
+
+		return field.Hide(old, player, &originPlayer);
 	};
 	bool Move(int row, int column, char dir, NField& field) {
 		return field.Move(row, column, dir);
 	};
 	void Refresh(NField& field) {
-		field.Refreash();
+		//field.Refreash();
 	};
 	bool ISDEAD() {
-		return player.isDead;
+		return originPlayer.isDead;
 	}
+	NClient* client;
 private:
 	NPlayer originPlayer;
 	NCharacter player;
+	
 };
 
 
@@ -467,6 +717,10 @@ public:
 	void printField() {
 		field.PrintMe();
 	}
+
+	std::string rightInput() {
+
+	}
 	//ход игры
 	void gameRun() {
 		std::string SSS = "Characters.txt";
@@ -475,68 +729,173 @@ public:
 		field.FillField(5);
 		std::string name1 = "Alex";
 		std::string name2 = "Lesha";
-		Bandit bandit(name1, deck, field);
-		Inspector inspector(name2, deck, field);
+		Bandit bandit(name1, deck, field, &client1);
+		Inspector inspector(name2, deck, field, &client2);
+
+		//кароче, клиент1 пока что всегда бандитом будет (его передаём же)))
+		client1.init("Bandit");
 
 		while (!gameOver) {
 			using std::cout;
 			using std::cin;
-
-			printField();
-			//ход бандита (ввод действия от игрока) (если кто-то умирает пишешь break)
+			std::string inp;
+			//принтим поле у клиента1
+			client1.printField(field.sendNoods());
 			cout << "Ход Бандита\n";
-			int choose,x,y;
-			char updown;
-			cin >> choose;
 			again1:
-			switch (choose) {
-			case 1: {
-				cout << "Введите координаты убиваемого\n";
-				cin >> x; cin >> y;
-				if (!bandit.Kill(x, y, field)) { goto again1; };
+			//принимаем ответ от клиента
+			inp = bandit.client->makeStep("Ходи");
+			if (sizeof(inp) < 1) cout << "error1, game while\n";
+			switch (inp[0]) {
+			case '1': {
+				if (!bandit.Kill((int)inp[1] - 48, (int)inp[2] - 48, field)) 
+					{ 
+						goto again1; 
+					};
 				break;
 			}
-			case 2: {
-				cout << "Прячемся\n";
-				if (!bandit.Hide(deck, field)) { goto again1; }
+			case '2': {
+					if (!bandit.Hide(deck, field)) 
+					{ 
+						goto again1; 
+					}
 				break;
 			}
-			case 3: {
-				cout << "Двигаем\n";
-				cin >> x; cin >> y; cin >> updown;
-				if (!bandit.Move(x, y, updown, field)) { goto again1; }
+			case '3': {
+				if (!bandit.Move((int)inp[1] - 48, (int)inp[2] - 48, inp[3], field))
+					{ 
+						goto again1; 
+					}
+				break;
+			}
+			default: {
+				cout << "input mistake, game while1\n";
 				break;
 			}
 			}
-			printField();
-			if (inspector.ISDEAD()) { gameOver = true; cout << "Game Over! Bandit" << name1 << "Wins!\n"; system("pause"); }
-			//ход инспектора (ввод действия от игрока)
+			//принтим поле у клиента2
+			client2.printField(field.sendNoods());
 			cout << "Ход Инспектора\n";
-			cin >> choose;
-			again2:
-			switch (choose) {
-			case 1: {
-				cout << "Введите координаты убиваемого\n";
-				cin >> x; cin >> y;
-				if (!inspector.Choose(x, y, field, deck)) { goto again2; }
+		again2:
+			inp = inspector.client->makeStep("Ходи");
+			if (sizeof(inp) < 1) cout << "error2, game while\n";
+			switch (inp[0]) {
+			case '1': {
+				//а нахера тут дека передаётся?
+				if (!inspector.Choose((int)inp[1] - 48, (int)inp[2] - 48, field, deck))
+				{
+					goto again2;
+				};
 				break;
 			}
-			case 2: {
-				cout << "Оправдываем\n";
-				cin >> x; cin >> y;
-				if (!inspector.Justify(x, y, field)) { goto again2; }
+			case '2': {
+				if (!inspector.Justify((int)inp[1] - 48, (int)inp[2] - 48, field))
+				{
+					goto again2;
+				}
 				break;
 			}
-			case 3: {
-				cout << "Двигаем\n";
-				cin >> x; cin >> y; cin >> updown;
-				if (!inspector.Move(x, y, updown, field)) { goto again2; }
+			case '3': {
+				if (!inspector.Move((int)inp[1] - 48, (int)inp[2] - 48, inp[3], field))
+				{
+					goto again2;
+				}
+				break;
+			}
+			default: {
+				cout << "input mistake, game while2\n";
 				break;
 			}
 			}
-			printField();
-			if (bandit.ISDEAD()) { gameOver = true; cout << "Game Over! Inspector" << name2 << "Wins!\n"; system("pause"); }
 		}
+
+		//while (!gameOver) {
+		//	using std::cout;
+		//	using std::cin;
+
+		//	printField();
+		//	//ход бандита (ввод действия от игрока) (если кто-то умирает пишешь break)
+		//	cout << "ход бандита\n";
+		//	int choose,x,y;
+		//	char updown;
+		//	cin >> choose;
+		//	again1:
+		//	switch (choose) {
+		//	case 1: {
+		//		cout << "введите координаты убиваемого\n";
+		//		cin >> x; cin >> y;
+		//		if (!bandit.Kill(x, y, field)) 
+		//		{ 
+		//			goto again1; 
+		//		};
+		//		break;
+		//	}
+		//	case 2: {
+		//		cout << "прячемся\n";
+		//		if (!bandit.Hide(deck, field)) 
+		//		{ 
+		//			goto again1; 
+		//		}
+		//		break;
+		//	}
+		//	case 3: {
+		//		cout << "двигаем\n";
+		//		cin >> x; cin >> y; cin >> updown;
+		//		if (!bandit.Move(x, y, updown, field)) 
+		//		{ 
+		//			goto again1; 
+		//		}
+		//		break;
+		//	}
+		//	}
+		//	printField();
+		//	if (inspector.ISDEAD()) 
+		//	{ 
+		//		gameOver = true; 
+		//		cout << "game over! bandit" << name1 << "wins!\n"; 
+		//		system("pause"); 
+		//	}
+		//	//ход инспектора (ввод действия от игрока)
+		//	cout << "ход инспектора\n";
+		//	cin >> choose;
+		//	again2:
+		//	switch (choose) {
+		//	case 1: {
+		//		cout << "введите координаты тыкуемого\n";
+		//		cin >> x; cin >> y;
+		//		if (!inspector.Choose(x, y, field, deck)) 
+		//		{ 
+		//			goto again2; 
+		//		}
+		//		break;
+		//	}
+		//	case 2: {
+		//		cout << "оправдываем\n";
+		//		cin >> x; cin >> y;
+		//		if (!inspector.Justify(x, y, field)) 
+		//		{ 
+		//			goto again2; 
+		//		}
+		//		break;
+		//	}
+		//	case 3: {
+		//		cout << "двигаем\n";
+		//		cin >> x; cin >> y; cin >> updown;
+		//		if (!inspector.Move(x, y, updown, field)) 
+		//		{ 
+		//			goto again2; 
+		//		}
+		//		break;
+		//	}
+		//	}
+		//	printField();
+		//	if (bandit.ISDEAD()) 
+		//	{ 
+		//		gameOver = true; 
+		//		cout << "game over! inspector" << name2 << "wins!\n"; 
+		//		system("pause"); 
+		//	}
+		//}
 	}
 
 private:
@@ -551,7 +910,11 @@ private:
 	bool gameOver = false;
 	//название
 	std::string gameName = "Bandit vs Inspector\n";
+	NClient client1;
+	NClient client2;
 };
+
+
 
 
 int main() {
